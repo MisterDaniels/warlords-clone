@@ -1,7 +1,6 @@
 function init(self)
-	self.moving = true
-	self.dir = vmath.vector3(1, 0, 0)
-	self.speed = 50
+	local pos = vmath.vector3(-64, 94, 0)
+	factory.create('/unity-spawner#unity-factory', pos)
 end
 
 function final(self)
@@ -11,11 +10,9 @@ function final(self)
 end
 
 function update(self, dt)
-	if self.moving then
-		local pos = go.get_position()
-		pos = pos + self.dir * self.speed * dt
-		go.set_position(pos)
-	end
+	-- Add update code here
+	-- Learn more: https://defold.com/manuals/script/
+	-- Remove this function if not needed
 end
 
 function fixed_update(self, dt)
