@@ -53,6 +53,7 @@ function on_input(self, action_id, action)
 		if action_id == hash('action') then
 			msg.post('/unity-spawner#unity-spawner', 'spawn', {
 				line = self.selected_line
+				lines_quantity = self.lines
 			})
 		end
 	end

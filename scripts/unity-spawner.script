@@ -1,5 +1,5 @@
 function init(self)
-	
+	self.unit_size = 64
 end
 
 function final(self)
@@ -23,8 +23,8 @@ end
 
 function on_message(self, message_id, message, sender)
 	if message_id == hash('spawn') then
-		local pos = vmath.vector3(-64, (message.line * 64) + 32, 0)
-		factory.create('/unity-spawner#unity-factory', pos)
+		local pos = vmath.vector3(-self.unit_size, (message.line * self.unit_size) + self.unit_size / 2, 0)
+		factory.create('/unity-spawner#unity-factory', pos, nil, {}, 1 / message.lines_quantity)
 	end
 end
 
