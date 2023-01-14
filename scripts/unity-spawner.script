@@ -23,8 +23,17 @@ end
 
 function on_message(self, message_id, message, sender)
 	if message_id == hash('spawn') then
-		local pos = vmath.vector3(-self.unit_size, (message.line * self.unit_size) + self.unit_size / 2, 0)
-		factory.create('/unity-spawner#unity-factory', pos, nil, {}, 1 / message.lines_quantity)
+		local pos = vmath.vector3(0, 0, 0)
+		if message.side == hash('left') then
+			pos = vmath.vector3(-self.unit_size, (message.line * self.unit_size) + self.unit_size / 2, 0)
+		elseif message.side == hash('right') then
+			local wx = window.get_size()
+			pos = vmath.vector3(wx + self.unit_size, (message.line * self.unit_size) + self.unit_size / 2, 0)
+		end
+
+		factory.create('/unity-spawner#unity-factory', pos, nil, {
+			side = message.side
+		}, 1)
 	end
 end
 

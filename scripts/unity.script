@@ -1,7 +1,15 @@
 function init(self)
+	go.property('side', hash('left'))
+
 	self.moving = true
-	self.dir = vmath.vector3(1, 0, 0)
 	self.speed = 50
+
+	if self.side == hash('left') then
+		self.dir = vmath.vector3(1, 0, 0)
+	elseif self.side == hash('right') then
+		sprite.set_hflip('.', true)
+		self.dir = vmath.vector3(-1, 0, 0)
+	end
 end
 
 function final(self)
