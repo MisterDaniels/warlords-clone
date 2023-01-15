@@ -22,13 +22,13 @@ function fixed_update(self, dt)
 end
 
 function on_message(self, message_id, message, sender)
+	print(GAME_WIDTH)
 	if message_id == hash('spawn') then
 		local pos = vmath.vector3(0, 0, 0)
 		if message.side == hash('left') then
 			pos = vmath.vector3(-self.unit_size, (message.line * self.unit_size) + self.unit_size / 2, 0)
 		elseif message.side == hash('right') then
-			local wx = window.get_size()
-			pos = vmath.vector3(wx + self.unit_size, (message.line * self.unit_size) + self.unit_size / 2, 0)
+			pos = vmath.vector3(GAME_WIDTH + self.unit_size, (message.line * self.unit_size) + self.unit_size / 2, 0)
 		end
 
 		factory.create('/unity-spawner#unity-factory', pos, nil, {

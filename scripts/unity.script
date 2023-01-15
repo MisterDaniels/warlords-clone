@@ -9,6 +9,7 @@ function init(self)
 	elseif self.side == hash('right') then
 		sprite.set_hflip('.', true)
 		self.dir = vmath.vector3(-1, 0, 0)
+		physics.set_group('#collision', 'enemy')
 	end
 end
 
@@ -34,9 +35,17 @@ function fixed_update(self, dt)
 end
 
 function on_message(self, message_id, message, sender)
-	-- Add message-handling code here
-	-- Learn more: https://defold.com/manuals/message-passing/
-	-- Remove this function if not needed
+	if message_id == hash('collision_response') then
+		self.moving = false
+		
+		msg.post(message.other_id, 'damage', {
+			damage = 10
+		})
+	end
+
+	if message_id == hash('damage') then
+		print('damage', message.damage)
+	end
 end
 
 function on_input(self, action_id, action)

@@ -3,6 +3,11 @@ function init(self)
 	self.selected_line = 1
 
 	msg.post('.', 'acquire_input_focus')
+	
+	msg.post('/unity-spawner#unity-spawner', 'spawn', {
+		side = hash('right'),
+		line = 1
+	})
 end
 
 function final(self)
