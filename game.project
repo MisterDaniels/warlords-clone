@@ -15,6 +15,7 @@ input_method = HiddenInputField
 [project]
 title = warlords-clone
 developer = Daniel Silva
+custom_resources = res/
 
 [physics]
 gravity_y = 0.0

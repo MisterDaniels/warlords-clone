@@ -1,15 +1,22 @@
 function init(self)
 	go.property('side', hash('left'))
+	go.property('speed', 50)
+	go.property('time_to_spawn', 2) -- seconds
+	go.property('health', 10)
+	go.property('attack_damage', 10) -- base modifier
+	go.property('attack_speed', 2) -- seconds
+	go.property('attack_accuracy', 80) -- percentage
+	go.property('attack_critical', 1) -- percentage
 
 	self.moving = true
-	self.speed = 50
-
+	
 	if self.side == hash('left') then
 		self.dir = vmath.vector3(1, 0, 0)
 	elseif self.side == hash('right') then
 		sprite.set_hflip('.', true)
 		self.dir = vmath.vector3(-1, 0, 0)
 		physics.set_group('#collision', 'enemy')
+		physics.set_maskbit('#collision', 'unity', true)
 	end
 end
 
@@ -35,16 +42,44 @@ function fixed_update(self, dt)
 end
 
 function on_message(self, message_id, message, sender)
-	if message_id == hash('collision_response') then
+	if message_id == hash('trigger_response') and message.enter then
+		if self.attack_timer then
+			return
+		end
+
 		self.moving = false
-		
-		msg.post(message.other_id, 'damage', {
-			damage = 10
-		})
+
+		self.attack_timer = timer.delay(self.attack_speed, true, function()
+			if message.other_id == nil then
+				timer.cancel(self.attack_timer)
+				self.moving = true
+			end
+			
+			damage = math.random(1, self.attack_damage)
+			
+			msg.post(message.other_id, 'damage', {
+				damage = damage
+			})
+		end)
+	elseif message_id == hash('trigger_response') and not message.enter then
+		self.moving = true
+		timer.cancel(self.attack_timer)
 	end
 
 	if message_id == hash('damage') then
-		print('damage', message.damage)
+		self.health = self.health - message.damage
+
+		if self.health <= 0 then
+			msg.post('.', 'disable')
+			go.delete(true)
+		end
+		
+		print('damage', message.damage, 'from', message.other_id)
+	end
+
+	if message_id == hash('refresh') then
+		print(message.atlas)
+		go.property('image', resource.atlas('/atlases/unities/' + message.atlas))
 	end
 end
 

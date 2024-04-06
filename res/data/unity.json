@@ -1,0 +1,32 @@
+{
+	"unities": [
+		{
+			"id": 1,
+			"name": "Skeleton Warrior",
+			"source": "sk_warrior",
+			"time_to_spawn": 2,
+			"speed": 50,
+			"health": 10,
+			"attack": {
+				"damage": 10,
+				"speed": 2,
+				"accuracy": 80,
+				"critical": 1
+			}
+		},
+		{
+			"id": 2,
+			"name": "Skeleton Spearman",
+			"source": "sk_spearman",
+			"time_to_spawn": 3,
+			"speed": 60,
+			"health": 8,
+			"attack": {
+				"damage": 12,
+				"speed": 1.6,
+				"accuracy": 80,
+				"critical": 2
+			}
+		}
+	]
+}

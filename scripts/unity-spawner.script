@@ -1,3 +1,5 @@
+local constants = require('data/constants')
+
 function init(self)
 	self.unit_size = 64
 end
@@ -22,17 +24,29 @@ function fixed_update(self, dt)
 end
 
 function on_message(self, message_id, message, sender)
-	print(GAME_WIDTH)
 	if message_id == hash('spawn') then
 		local pos = vmath.vector3(0, 0, 0)
 		if message.side == hash('left') then
-			pos = vmath.vector3(-self.unit_size, (message.line * self.unit_size) + self.unit_size / 2, 0)
+			pos = vmath.vector3(-constants.UNIT_SIZE, (message.line * constants.UNIT_SIZE) + constants.UNIT_SIZE / 2, 0)
 		elseif message.side == hash('right') then
-			pos = vmath.vector3(GAME_WIDTH + self.unit_size, (message.line * self.unit_size) + self.unit_size / 2, 0)
+			pos = vmath.vector3(GAME_WIDTH + constants.UNIT_SIZE, (message.line * constants.UNIT_SIZE) + constants.UNIT_SIZE / 2, 0)
 		end
 
+		local json_file = sys.load_resource('/res/data/unity.json')
+		local data = json.decode(json_file)
+		local unity = data.unities[message.unity_id]
+
+		factory.set_prototype('/unity-spawner#unity-factory', '/game-objects/sk_spearman.goc')
+		
 		factory.create('/unity-spawner#unity-factory', pos, nil, {
-			side = message.side
+			side = message.side,
+			speed = unity.speed,
+			time_to_spawn = unity.time_to_spawn,
+			health = unity.health,
+			attack_damage = unity.attack.damage,
+			attack_speed = unity.attack.speed,
+			attack_accuracy = unity.attack.accuracy,
+			attack_critical = unity.attack.critical
 		}, 1)
 	end
 end

@@ -1,2 +1,3 @@
 prototype: "/game-objects/unity.go"
-load_dynamically: false
+load_dynamically: true
+dynamic_prototype: true

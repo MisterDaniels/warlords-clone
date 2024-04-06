@@ -1,12 +1,20 @@
+local constants = require('data/constants')
+
 function init(self)
 	self.lines = 5
 	self.selected_line = 1
+	self.selected_unity = 1
+	self.unities_available = {1, 2}
 
 	msg.post('.', 'acquire_input_focus')
-	
+
+	json_file = sys.load_resource('/res/data/unity.json')
+	self.unity = json.decode(json_file)
+
 	msg.post('/unity-spawner#unity-spawner', 'spawn', {
 		side = hash('right'),
-		line = 1
+		line = 1,
+		unity_id = 1
 	})
 end
 
@@ -40,25 +48,66 @@ function on_input(self, action_id, action)
 		if action_id == hash('move-up') then
 			if self.selected_line == self.lines then
 				self.selected_line = 1
-				return
+			else
+				self.selected_line = self.selected_line + 1
 			end
 
-			self.selected_line = self.selected_line + 1
+			moved_y_axis = true
 		end
 
 		if action_id == hash('move-down') then
 			if self.selected_line == 1 then
 				self.selected_line = self.lines
-				return
+			else
+				self.selected_line = self.selected_line - 1
 			end
 
-			self.selected_line = self.selected_line - 1
+			moved_y_axis = true
+		end
+
+		if action_id == hash('move-right') then
+			if self.selected_unity == #self.unities_available then
+				self.selected_unity = 1
+			else
+				self.selected_unity = self.selected_unity + 1
+			end
+
+			moved_x_axis = true
+		end
+		
+		if action_id == hash('move-left') then
+			if self.selected_unity == 1 then
+				self.selected_unity = #self.unities_available
+			else
+				self.selected_unity = self.selected_unity - 1
+			end
+				
+			moved_x_axis = true
+		end
+		
+		if moved_y_axis then
+			pos = vmath.vector3(constants.UNIT_SIZE, (self.selected_line * constants.UNIT_SIZE) + constants.UNIT_SIZE / 2, 0)
+			go.set_position(pos, '/cursor#unity')
+			go.set('/cursor#unity', 'tint.w', 0.4)
+		end
+
+		if moved_x_axis then
+			print(self.selected_unity)
+			msg.post('/cursor', 'refresh', {
+				atlas = hash('sk_spearman')
+			})
+
+			local atlas_path = 'atlases/unities/sk_spearman'
+			local atlas_resource = resource.atlas('/atlases/unities/sk_spearman.atlas')
+			
+			go.set('/cursor#unity', 'image', atlas_resource)
 		end
 		
 		if action_id == hash('action') then
 			msg.post('/unity-spawner#unity-spawner', 'spawn', {
 				side = hash('left'),
-				line = self.selected_line
+				line = self.selected_line,
+				unity_id = self.unities_available[self.selected_unity]
 			})
 		end
 	end
