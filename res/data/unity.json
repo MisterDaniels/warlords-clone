@@ -22,10 +22,24 @@
 			"speed": 60,
 			"health": 8,
 			"attack": {
-				"damage": 12,
+				"damage": 8,
 				"speed": 1.6,
 				"accuracy": 80,
 				"critical": 2
+			}
+		},
+		{
+			"id": 3,
+			"name": "Skeleton Archer",
+			"source": "sk_archer",
+			"time_to_spawn": 3,
+			"speed": 60,
+			"health": 6,
+			"attack": {
+				"damage": 10,
+				"speed": 3,
+				"accuracy": 60,
+				"critical": 10
 			}
 		}
 	]

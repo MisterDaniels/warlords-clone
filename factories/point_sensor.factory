@@ -1,0 +1,3 @@
+prototype: "/game-objects/point_sensor.go"
+load_dynamically: false
+dynamic_prototype: false

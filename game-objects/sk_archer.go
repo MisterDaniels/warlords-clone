@@ -1,6 +1,6 @@
 components {
   id: "unity"
-  component: "/sprites/unity.sprite"
+  component: "/sprites/sk_archer.sprite"
   position {
     x: 0.0
     y: 0.0
@@ -38,6 +38,7 @@ embedded_components {
   "restitution: 0.0\n"
   "group: \"unity\"\n"
   "mask: \"enemy\"\n"
+  "mask: \"sensor\"\n"
   "embedded_collision_shape {\n"
   "  shapes {\n"
   "    shape_type: TYPE_BOX\n"

@@ -1,14 +1,24 @@
-function init(self)
-	go.property('side', hash('left'))
-	go.property('speed', 50)
-	go.property('time_to_spawn', 2) -- seconds
-	go.property('health', 10)
-	go.property('attack_damage', 10) -- base modifier
-	go.property('attack_speed', 2) -- seconds
-	go.property('attack_accuracy', 80) -- percentage
-	go.property('attack_critical', 1) -- percentage
+local List = require 'scripts.modules.list-utils'
 
+go.property('side', hash('left'))
+go.property('speed', 50)
+go.property('time_to_spawn', 2) -- seconds
+go.property('max_health', 10)
+go.property('health', 10)
+go.property('attack_damage', 10) -- base modifier
+go.property('attack_speed', 2) -- seconds
+go.property('attack_accuracy', 80) -- percentage
+go.property('attack_critical', 1) -- percentage
+go.property('line', 0)
+go.property('line_quantity', 6)
+go.property('attack_multiple', false)
+
+function init(self)
 	self.moving = true
+	self.combating = false
+	self.targets = {}
+
+	sprite.play_flipbook('#unity', hash('walk'))
 	
 	if self.side == hash('left') then
 		self.dir = vmath.vector3(1, 0, 0)
@@ -42,44 +52,54 @@ function fixed_update(self, dt)
 end
 
 function on_message(self, message_id, message, sender)
+	if message.other_group == hash('sensor') then return end
+
+	if self.line ~= go.get(msg.url(nil, message.other_id, 'unity-script'), 'line') or self.health == 0 then
+		return
+	end
+
+	if self.combating and not self.attack_multiple then
+		return
+	end
+
 	if message_id == hash('trigger_response') and message.enter then
-		if self.attack_timer then
+		if not List.isValueInList(self.target, hash(message.other_id)) then
+			table.insert(self.targets, hash(message.other_id))
+		end
+
+		if self.attack_timer and timer.get_info(self.attack_timer) then
 			return
 		end
 
+		sprite.play_flipbook('#unity', hash('idle'))
 		self.moving = false
 
-		self.attack_timer = timer.delay(self.attack_speed, true, function()
-			if message.other_id == nil then
-				timer.cancel(self.attack_timer)
-				self.moving = true
-			end
-			
-			damage = math.random(1, self.attack_damage)
-			
-			msg.post(message.other_id, 'damage', {
-				damage = damage
-			})
-		end)
+		attackTarget(self)
 	elseif message_id == hash('trigger_response') and not message.enter then
-		self.moving = true
-		timer.cancel(self.attack_timer)
+		local currentTargetId = self.targets[1]
+
+		self.targets = List.removeValueInList(self.targets, hash(message.other_id))
+
+		if currentTargetId and #self.targets == 0 then
+			self.moving = true
+			self.combating = false
+
+			sprite.play_flipbook('#unity', hash('walk'))
+			timer.cancel(self.attack_timer)
+		end
 	end
 
 	if message_id == hash('damage') then
 		self.health = self.health - message.damage
 
 		if self.health <= 0 then
-			msg.post('.', 'disable')
-			go.delete(true)
+			timer.delay(0.5, false, function()
+				msg.post('.', 'disable')
+				go.delete(true)
+			end)
 		end
 		
 		print('damage', message.damage, 'from', message.other_id)
-	end
-
-	if message_id == hash('refresh') then
-		print(message.atlas)
-		go.property('image', resource.atlas('/atlases/unities/' + message.atlas))
 	end
 end
 
@@ -99,4 +119,20 @@ function on_reload(self)
 	-- Add reload-handling code here
 	-- Learn more: https://defold.com/manuals/hot-reload/
 	-- Remove this function if not needed
+end
+
+function attackTarget(self)
+	self.attack_timer = timer.delay(self.attack_speed, true, function()
+		if self.health <= 0 or #self.targets == 0 then return end
+
+		sprite.play_flipbook('#unity', hash('attack'), function()
+			sprite.play_flipbook('#unity', hash('idle'))
+		end)
+
+		damage = math.random(1, self.attack_damage)
+
+		msg.post(self.targets[1], 'damage', {
+			damage = damage
+		})
+	end)
 end

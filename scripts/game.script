@@ -1,19 +1,25 @@
+local List = require 'scripts.modules.list-utils'
+
 local constants = require('data/constants')
 
 function init(self)
-	self.lines = 5
+	go.property('player_side', hash('left'))
+	go.property('lines', 5)
 	self.selected_line = 1
 	self.selected_unity = 1
 	self.unities_available = {1, 2}
+	self.unities_time = {}
 
 	msg.post('.', 'acquire_input_focus')
 
 	json_file = sys.load_resource('/res/data/unity.json')
-	self.unity = json.decode(json_file)
+	data = json.decode(json_file)
+	self.unity = data.unities
 
 	msg.post('/unity-spawner#unity-spawner', 'spawn', {
 		side = hash('right'),
 		line = 1,
+		line_quantity = self.lines,
 		unity_id = 1
 	})
 end
@@ -25,9 +31,7 @@ function final(self)
 end
 
 function update(self, dt)
-	-- Add update code here
-	-- Learn more: https://defold.com/manuals/script/
-	-- Remove this function if not needed
+	
 end
 
 function fixed_update(self, dt)
@@ -92,22 +96,29 @@ function on_input(self, action_id, action)
 		end
 
 		if moved_x_axis then
-			print(self.selected_unity)
-			msg.post('/cursor', 'refresh', {
-				atlas = hash('sk_spearman')
-			})
-
-			local atlas_path = 'atlases/unities/sk_spearman'
-			local atlas_resource = resource.atlas('/atlases/unities/sk_spearman.atlas')
-			
-			go.set('/cursor#unity', 'image', atlas_resource)
+			sprite.play_flipbook('/cursor#unity', hash(self.unity[self.selected_unity].source))
 		end
 		
 		if action_id == hash('action') then
+			unity_id = self.unities_available[self.selected_unity]
+
+			if List.isInList(self.unities_time, unity_id) then
+				return
+			end
+
+			index = table.insert(self.unities_time, {
+				id = unity_id,
+				time = 2,
+				timer = timer.delay(self.unity[self.selected_unity].time_to_spawn, false, function()
+					table.remove(self.unities_time, index)
+				end)
+			})
+
 			msg.post('/unity-spawner#unity-spawner', 'spawn', {
 				side = hash('left'),
 				line = self.selected_line,
-				unity_id = self.unities_available[self.selected_unity]
+				line_quantity = self.lines,
+				unity_id = unity_id
 			})
 		end
 	end

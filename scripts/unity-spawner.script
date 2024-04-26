@@ -36,7 +36,7 @@ function on_message(self, message_id, message, sender)
 		local data = json.decode(json_file)
 		local unity = data.unities[message.unity_id]
 
-		factory.set_prototype('/unity-spawner#unity-factory', '/game-objects/sk_spearman.goc')
+		factory.set_prototype('/unity-spawner#unity-factory', '/game-objects/' .. unity.source .. '.goc')
 		
 		factory.create('/unity-spawner#unity-factory', pos, nil, {
 			side = message.side,
@@ -46,7 +46,9 @@ function on_message(self, message_id, message, sender)
 			attack_damage = unity.attack.damage,
 			attack_speed = unity.attack.speed,
 			attack_accuracy = unity.attack.accuracy,
-			attack_critical = unity.attack.critical
+			attack_critical = unity.attack.critical,
+			line = message.line,
+			line_quantity = message.line_quantity
 		}, 1)
 	end
 end

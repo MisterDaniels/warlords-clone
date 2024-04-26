@@ -1,0 +1,4 @@
+tile_set: "/atlases/ui/unities.atlas"
+default_animation: "sk_warrior"
+material: "/builtins/materials/sprite.material"
+blend_mode: BLEND_MODE_ALPHA

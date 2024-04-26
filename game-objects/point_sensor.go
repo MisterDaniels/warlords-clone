@@ -1,21 +1,6 @@
 components {
-  id: "unity"
-  component: "/sprites/unity.sprite"
-  position {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 1.0
-  }
-}
-components {
-  id: "unity-script"
-  component: "/scripts/unity.script"
+  id: "point-sensor"
+  component: "/scripts/point-sensor.script"
   position {
     x: 0.0
     y: 0.0
@@ -29,21 +14,22 @@ components {
   }
 }
 embedded_components {
-  id: "collision"
+  id: "sensor"
   type: "collisionobject"
   data: "collision_shape: \"\"\n"
   "type: COLLISION_OBJECT_TYPE_TRIGGER\n"
   "mass: 0.0\n"
   "friction: 0.0\n"
   "restitution: 0.0\n"
-  "group: \"unity\"\n"
+  "group: \"sensor\"\n"
   "mask: \"enemy\"\n"
+  "mask: \"unity\"\n"
   "embedded_collision_shape {\n"
   "  shapes {\n"
   "    shape_type: TYPE_BOX\n"
   "    position {\n"
   "      x: 0.0\n"
-  "      y: -32.0\n"
+  "      y: 0.0\n"
   "      z: 0.0\n"
   "    }\n"
   "    rotation {\n"
